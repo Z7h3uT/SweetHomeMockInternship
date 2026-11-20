@@ -750,22 +750,34 @@ public class FurnitureTable extends JTable implements View, Printable {
           return headerRendererLabel;
         }
       };
-    for (int columnIndex = 0, n = columnModel.getColumnCount(); columnIndex < n; columnIndex++) {
-      final TableColumn tableColumn = columnModel.getColumn(columnIndex);
+    List<TableColumn> columns =
+            Collections.list(columnModel.getColumns());
+
+    TableColumn levelColumn =
+            ((FurnitureTableColumnModel) columnModel)
+                    .availableColumns.get(
+                            HomePieceOfFurniture.SortableProperty.LEVEL);
+
+    if (!columns.contains(levelColumn)) {
+      columns.add(levelColumn);
+
+    }
+    for (final TableColumn tableColumn : columns) {
       // Create a printable column from existing table column
+
       TableColumn printableColumn = new TableColumn();
       printableColumn.setIdentifier(tableColumn.getIdentifier());
       printableColumn.setHeaderValue(tableColumn.getHeaderValue());
       TableCellRenderer printableCellRenderer = new TableCellRenderer() {
-          public Component getTableCellRendererComponent(JTable table, Object value, 
+          public Component getTableCellRendererComponent(JTable table, Object value,
                                  boolean isSelected, boolean hasFocus, int row, int column) {
-            // Delegate rendering to existing cell renderer 
+            // Delegate rendering to existing cell renderer
             TableCellRenderer cellRenderer = tableColumn.getCellRenderer();
-            Component rendererComponent = cellRenderer.getTableCellRendererComponent(table, value, 
+            Component rendererComponent = cellRenderer.getTableCellRendererComponent(table, value,
                 isSelected, hasFocus, row, column);
             if (rendererComponent instanceof JCheckBox) {
               // Prefer a x sign for boolean values instead of check boxes
-              rendererComponent = defaultRenderer.getTableCellRendererComponent(table, 
+              rendererComponent = defaultRenderer.getTableCellRendererComponent(table,
                   ((JCheckBox)rendererComponent).isSelected() ? "x" : "", false, false, row, column);
             }
             rendererComponent.setBackground(Color.WHITE);
@@ -773,7 +785,7 @@ public class FurnitureTable extends JTable implements View, Printable {
             return rendererComponent;
           }
         };
-      // Change printable column cell renderer 
+      // Change printable column cell renderer
       printableColumn.setCellRenderer(printableCellRenderer);
       // Change printable column header renderer
       printableColumn.setHeaderRenderer(printableHeaderRenderer);
